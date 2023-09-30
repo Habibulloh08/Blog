@@ -1,7 +1,7 @@
-const Home = () => {
-  return (
-    <div>Home</div>
-  )
-}
+import { Button } from "@chakra-ui/react";
 
-export default Home
+const Home = () => {
+  return <div>Home</div>;
+};
+
+export default Home;
