@@ -1,4 +1,4 @@
-import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
+import { ArrowBackIcon, ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { Button, FormControl, FormLabel, Input, Text } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -9,6 +9,7 @@ const SignUp = () => {
   const pasRef2 = useRef();
   const [showPass1, setShowPass1] = useState(false);
   const [showPass2, setShowPass2] = useState(false);
+  const [isInvalidUsername, setIsInvalidUsename] = useState(true);
 
   useEffect(() => {
     if (showPass1) {
@@ -22,18 +23,62 @@ const SignUp = () => {
       pasRef2.current.type = "password";
     }
   }, [showPass1, showPass2]);
+  const singUpFunc = (e) => {
+    e.preventDefault();
+    const [fullname, username, password, rpassword] =
+      e.target.querySelectorAll("input");
+    setIsInvalidUsename(/^[@_a-zA-Z]+$/.test(username.value));
+    if (isInvalidUsername == true) {
+      console.log(
+        fullname.value,
+        username.value,
+        password.value,
+        rpassword.value
+      );
+      // startLoading();
+      // setTimeout(() => {
+      //   endLoading(true);
+      // }, 2000);
+      // toast({
+      //   title: "Hello",
+      //   status: "success",
+      //   position: "top",
+      //   variant: "top-accent",
+      // });
+    } else {
+      setIsInvalidUsename((p) => ({
+        ...p,
+        username: /^[@_a-zA-Z]+$/.test(username.value),
+      }));
+    }
+  };
   return (
     <>
       <div className="h-screen w-full flex items-center justify-center flex-col">
         <div className="w-full max-w-[440px] shadow-lg p-8 rounded-xl">
-          <Text fontSize="2xl" className="font-bold text-center mb-[40px]">
-            Sign Un
-          </Text>
-          <FormControl>
+          <div className="relative">
+            <ArrowBackIcon
+              onClick={() => navigate("/")}
+              className="cursor-pointer text-[23px] absolute left-0 top-[50%] -translate-y-[50%]"
+            />
+            <Text fontSize="2xl" className="font-bold text-center mb-[40px]">
+              Sign Up
+            </Text>
+          </div>
+          <form onSubmit={(e) => singUpFunc(e)}>
             <FormLabel htmlFor="fullname">Full Name</FormLabel>
             <Input id="fullname" type="text" />
             <FormLabel htmlFor="username">User Name</FormLabel>
-            <Input id="username" type="text" />
+            <Input
+              id="username"
+              type="text"
+              onChange={(e) => {
+                setIsInvalidUsename(/^[@_a-zA-Z]+$/.test(e.target.value));
+              }}
+            />
+            {isInvalidUsername == false > 1 && (
+              <p className="text-[15px] text-red-500 p-1">Invalid username </p>
+            )}
             <div className="relative">
               <FormLabel htmlFor="password" className="mt-[20px]">
                 Password
@@ -68,10 +113,14 @@ const SignUp = () => {
                 />
               )}
             </div>
-            <Button colorScheme="blue" className="w-full mt-[20px]">
+            <Button
+              type="submit"
+              colorScheme="blue"
+              className="w-full mt-[20px]"
+            >
               Sign Up
             </Button>
-          </FormControl>
+          </form>
         </div>
         <Button
           onClick={() => navigate("/sign-in")}

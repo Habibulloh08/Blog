@@ -4,11 +4,11 @@ import Navbar from "../components/Navbar";
 const Layout = () => {
   return (
     <>
-      <header className=" bg-white px-[50px] sticky top-0 z-50">
+      <header className=" sticky z-50 py-[15px] shadow">
         <Navbar />
       </header>
       <main className="w-full mx-auto max-w-[800px]">
-        <div className="bg-red-300">
+        <div >
           <Outlet />
         </div>
       </main>
