@@ -10,6 +10,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useLoader from "../../store";
+import useUserApi from "../../service/user";
 
 const SigIn = () => {
   const toast = useToast();
@@ -19,27 +20,55 @@ const SigIn = () => {
   const [showPass, setShowPass] = useState(false);
   const [isInvalidUsername, setIsInvalidUsename] = useState(true);
 
+  const { signIn } = useUserApi();
+
+  useEffect(() => {
+    if (showPass) {
+      pasRef.current.type = "text";
+    } else {
+      pasRef.current.type = "password";
+    }
+  }, [showPass]);
   const singInFunc = (e) => {
     e.preventDefault();
     const [username, password] = e.target.querySelectorAll("input");
     setIsInvalidUsename(/^[@_a-zA-Z]+$/.test(username.value));
 
     if (isInvalidUsername == true) {
-      // startLoading();
-      // setTimeout(() => {
-      //   endLoading(true);
-      // }, 2000);
-      // toast({
-      //   title: "Hello",
-      //   status: "success",
-      //   position: "top",
-      //   variant: "top-accent",
-      // });
+      setIsInvalidUsename(true);
+      startLoading();
+      const body = {
+        username: username.value,
+        password: password.value,
+      };
+      signIn({ ...body })
+        .then((res) => {
+          setIsInvalidUsename(true);
+          endLoading();
+          console.log(res.data);
+          if (res.data) {
+            toast({
+              title: "Your're successfully logged in",
+              status: "success",
+              position: "top",
+            });
+            localStorage.setItem("token", res.data?.token);
+            localStorage.setItem("my_id", res.data?.user?.id);
+            localStorage.setItem("username", res.data?.user?.username);
+            return navigate("/");
+          }
+        })
+        .catch((err) => {
+          endLoading();
+          setIsInvalidUsename(true);
+          toast({
+            title: err.response.data.message,
+            status: "error",
+            position: "top",
+          });
+        });
     } else {
-      setIsInvalidUsename((p) => ({
-        ...p,
-        username: /^[@_a-zA-Z]+$/.test(username.value),
-      }));
+      setIsInvalidUsename(/^[@_a-zA-Z]+$/.test(username.value));
     }
   };
 
