@@ -1,16 +1,28 @@
 import { ArrowBackIcon, ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
-import { Button, FormControl, FormLabel, Input, Text } from "@chakra-ui/react";
+import {
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  Text,
+  useToast,
+} from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import useUserApi from "../../service/user";
+import useLoader from "../../store";
 
 const SignUp = () => {
   const navigate = useNavigate();
   const pasRef1 = useRef();
   const pasRef2 = useRef();
+  const toast = useToast();
   const [showPass1, setShowPass1] = useState(false);
   const [showPass2, setShowPass2] = useState(false);
   const [isInvalidUsername, setIsInvalidUsename] = useState(true);
+  const { isLoading, startLoading, endLoading } = useLoader();
 
+  const { signUp } = useUserApi();
   useEffect(() => {
     if (showPass1) {
       pasRef1.current.type = "text";
@@ -28,28 +40,44 @@ const SignUp = () => {
     const [fullname, username, password, rpassword] =
       e.target.querySelectorAll("input");
     setIsInvalidUsename(/^[@_a-zA-Z]+$/.test(username.value));
-    if (isInvalidUsername == true) {
-      console.log(
-        fullname.value,
-        username.value,
-        password.value,
-        rpassword.value
-      );
-      // startLoading();
-      // setTimeout(() => {
-      //   endLoading(true);
-      // }, 2000);
-      // toast({
-      //   title: "Hello",
-      //   status: "success",
-      //   position: "top",
-      //   variant: "top-accent",
-      // });
+    if (isInvalidUsername == true && password.value === rpassword.value) {
+      setIsInvalidUsename(true);
+
+      startLoading();
+      const body = {
+        full_name: fullname.value,
+        username: username.value,
+        password: password.value,
+      };
+      signUp({ ...body })
+        .then((res) => {
+          if (res.data) {
+            endLoading(true);
+            toast({
+              title: "Now login to your new account",
+              status: "info",
+              position: "top",
+            });
+            toast({
+              title: "You're successfully register new account",
+              status: "success",
+              position: "top",
+            });
+            navigate("/sign-in");
+          }
+        })
+        .catch((err) => {
+          endLoading(true);
+          setIsInvalidUsename(true);
+          toast({
+            title: err.response.data.message,
+            status: "error",
+            position: "top",
+          });
+        });
     } else {
-      setIsInvalidUsename((p) => ({
-        ...p,
-        username: /^[@_a-zA-Z]+$/.test(username.value),
-      }));
+      setIsInvalidUsename(true);
+      setIsInvalidUsename(/^[@_a-zA-Z]+$/.test(username.value));
     }
   };
   return (
@@ -67,7 +95,7 @@ const SignUp = () => {
           </div>
           <form onSubmit={(e) => singUpFunc(e)}>
             <FormLabel htmlFor="fullname">Full Name</FormLabel>
-            <Input id="fullname" type="text" />
+            <Input id="fullname" type="text" className="mb-2" />
             <FormLabel htmlFor="username">User Name</FormLabel>
             <Input
               id="username"
@@ -115,6 +143,7 @@ const SignUp = () => {
             </div>
             <Button
               type="submit"
+              isLoading={isLoading}
               colorScheme="blue"
               className="w-full mt-[20px]"
             >

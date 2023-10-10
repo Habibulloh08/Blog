@@ -1,7 +1,6 @@
 import { ViewIcon, ViewOffIcon, ArrowBackIcon } from "@chakra-ui/icons";
 import {
   Button,
-  FormControl,
   FormLabel,
   Input,
   Text,
