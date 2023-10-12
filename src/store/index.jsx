@@ -5,4 +5,5 @@ const useLoader = create((set) => ({
   startLoading: () => set(() => ({ isLoading: true })),
   endLoading: (payload) => set(() => ({ isLoading: payload && false })),
 }));
+
 export default useLoader;
