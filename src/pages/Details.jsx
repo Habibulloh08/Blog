@@ -3,28 +3,15 @@ import { useParams } from "react-router-dom";
 import usePostApi from "../service/blog";
 import User from "../assets/user.png";
 import useLoader from "../store/index";
-import {
-  Button,
-  ButtonGroup,
-  Code,
-  Popover,
-  PopoverArrow,
-  PopoverBody,
-  PopoverCloseButton,
-  PopoverContent,
-  PopoverFooter,
-  PopoverHeader,
-  PopoverTrigger,
-  useToast,
-} from "@chakra-ui/react";
+import { Code, useToast } from "@chakra-ui/react";
 import Loader from "../components/Ui/Loader";
-import { DeleteIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
+import { ViewIcon } from "@chakra-ui/icons";
 import parse from "html-react-parser";
 
 const Details = () => {
   const { getPostByID } = usePostApi();
   const { id } = useParams();
-  const [post, setPost] = useState(null);
+  const [post, setPost] = useState({});
   const { isLoading, startLoading, endLoading } = useLoader();
   const toast = useToast();
   useEffect(() => {
@@ -72,12 +59,14 @@ const Details = () => {
                 {localStorage.getItem("my_id") === post?.user?.id ? (
                   <div className="flex items-center gap-2">
                     <h3 className="font-bold text-gray-500 tex-[17px]">
-                      {post.user?.username}
+                      {post.user?.username}{" "}
                     </h3>{" "}
                     - you
                   </div>
                 ) : (
-                  post.user?.username
+                  <h3 className="font-bold text-gray-500 tex-[17px]">
+                    {post.user?.username}
+                  </h3>
                 )}
               </div>
             </div>
