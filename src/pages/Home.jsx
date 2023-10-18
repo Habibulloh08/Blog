@@ -36,7 +36,6 @@ const Home = () => {
       endLoading(true);
     };
   }, []);
-  console.log(posts);
   return (
     <div>
       <SubNavbar />

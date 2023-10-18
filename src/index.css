@@ -17,7 +17,6 @@
   display: inline-block;
   border-bottom: 2px solid transparent;
   transition: all 0.05s linear;
-
 }
 .card-title::after {
   transition: all 0.05s linear;
@@ -57,4 +56,16 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.nohover {
+  background: linear-gradient(90deg, #ff8a00 -0.07%, #bd00ff 100.07%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+.det-body img{
+  border-radius: 6px;
 }
