@@ -31,7 +31,6 @@ const Details = () => {
         });
       }
     };
-
     fetchData();
   }, [id]);
 

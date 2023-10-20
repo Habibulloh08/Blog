@@ -66,6 +66,10 @@
   display: inline-block;
 }
 
-.det-body img{
+.det-body img {
   border-radius: 6px;
+}
+
+.ant-btn-primary {
+  background-color: rgb(59, 137, 255);
 }

@@ -3,8 +3,9 @@ import api from "../axios";
 const usePostApi = () => {
   const getAllPosts = async () => api.get("/blog");
   const getPostByID = async (id) => api.get(`/blog/${id}`);
-  const deletePost = async (id)=> api.delete(`/blog/${id}`)
-  return { getAllPosts, getPostByID,deletePost };
+  const deletePost = async (id) => api.delete(`/blog/${id}`);
+  const createPost = async (data) => api.post(`/blog`, data);
+  return { getAllPosts, getPostByID, deletePost, createPost };
 };
 
 export default usePostApi;

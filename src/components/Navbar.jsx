@@ -12,7 +12,10 @@ const Navbar = () => {
         {localStorage.getItem("token") ? (
           <div className="flex items-center justify-center gap-4">
             <div className="border-[2px] rounded-full flex items-start justify-center p-[5px] border-black cursor-pointer ">
-              <AddIcon className="text-[16px] " />
+              <AddIcon
+                className="text-[16px] "
+                onClick={() => navigate("/create-post")}
+              />
             </div>
             <div className="h-[30px] w-[3px] bg-black "></div>
             <SettingsIcon className="set text-[24px] cursor-pointer" />
