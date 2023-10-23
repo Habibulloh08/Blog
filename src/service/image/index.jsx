@@ -1,9 +1,16 @@
 import api from "../axios";
 
-const useImagesApi = () => {
-  const posterImage = async (imageData, header) =>
-    api.post(`/image`, imageData, header);
+const config = {
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem("token")}`,
+    "Content-Type": "multipart/form-data",
+  },
+};
 
+
+const useImagesApi = () => {
+  const posterImage = async (imageData) =>
+    api.post(`/image`, imageData, config);
   return { posterImage };
 };
 

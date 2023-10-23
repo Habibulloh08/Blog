@@ -33,13 +33,14 @@ const Details = () => {
     };
     fetchData();
   }, [id]);
+  const index = post?.title?.indexOf("^*^");
 
   return (
     <>
       {isLoading ? (
         <Loader />
       ) : (
-        <div>
+        <div className="mb-4">
           <div className="flex items-center justify-between">
             {" "}
             <div className="flex items-center gap-2">
@@ -78,8 +79,20 @@ const Details = () => {
             </div>
           </div>
           <div className="mt-9">
+            {index > 0 && (
+              <div className="flex items-center justify-center">
+                <img
+                  className="object-cover"
+                  src={`https://nest-blog.up.railway.app/api/image/${post?.title?.slice(
+                    0,
+                    index
+                  )}`}
+                  alt="poster"
+                />
+              </div>
+            )}
             <h2 className=" nohover text-[27px] font-bold mb-4">
-              {post?.title}
+              {post?.title?.slice(index + 3, post.title.length)}
             </h2>
             <div className="det-body">{parse(`${post?.body}`)}</div>
           </div>

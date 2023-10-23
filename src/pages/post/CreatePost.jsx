@@ -1,20 +1,21 @@
-import { Input, useImage } from "@chakra-ui/react";
+import { Input, useToast } from "@chakra-ui/react";
 import { Button as Btn } from "antd";
 import { useRef, useState } from "react";
 import { Editor } from "@tinymce/tinymce-react";
 import useLoader from "../../store";
 import usePostApi from "../../service/blog";
 import useImagesApi from "../../service/image";
+import { useNavigate } from "react-router-dom";
 
 const CreatePost = () => {
   const { isLoading, startLoading, endLoading } = useLoader();
   const { createPost } = usePostApi();
   const { posterImage } = useImagesApi();
   const [title, setTitle] = useState("");
-  const [file, setFile] = useState(null);
+  const toast = useToast();
+  const navigate = useNavigate();
   const [fileConfig, setFileConfig] = useState({
     error: false,
-    loading: false,
     file: null,
   });
   const editorRef = useRef(null);
@@ -22,33 +23,63 @@ const CreatePost = () => {
   //fuksiya
 
   const createNewPost = () => {
-    let imageName = "";
-    if (editorRef.current && fileConfig.file) {
-      posterImage(
-        { image: fileConfig?.file?.name },
-        {
-          Authorization: localStorage.getItem("token"),
-          "Content-Type": fileConfig.file,
-        }
-      )
+    startLoading();
+    if (fileConfig.file) {
+      let formData = new FormData();
+      formData.append("image", fileConfig.file);
+
+      posterImage(formData)
         .then((res) => {
-          console.log(res.data);
-          imageName += res.data;
+          if (res.data.fileName) {
+            const body = {
+              title: `${res.data.fileName}^*^${title}`,
+              body: editorRef.current.getContent(),
+              user_id: localStorage.getItem("my_id"),
+            };
+            createPost(body)
+              .then((res) => {
+                if (res.data) {
+                  endLoading(true);
+                  toast({
+                    title: "New post successfully",
+                    status: "success",
+                    position: "top",
+                  });
+                  return navigate("/");
+                }
+              })
+              .catch((err) => {
+                endLoading(true),
+                  toast({
+                    title: err.message,
+                    status: "error",
+                    position: "top",
+                  });
+                console.log(err);
+              });
+          }
         })
-        .catch((err) => console.log(err));
-      console.log(editorRef.current.getContent());
+        .catch((err) => {
+          endLoading(true);
+          toast({
+            title: err.message,
+            status: "error",
+            position: "top",
+          });
+        });
+    } else {
+      console.log("file yo'q");
     }
   };
   const uploadFile = (e) => {
-    setFileConfig((p) => ({ ...p, loading: true }));
     if (e?.target?.files[0].size <= 1000000) {
       setFileConfig((p) => ({
         ...p,
         file: e?.target?.files[0],
-        loading: false,
+        error: false,
       }));
     } else {
-      setFileConfig((p) => ({ ...p, error: true, loading: false }));
+      setFileConfig((p) => ({ ...p, error: true, error: true }));
     }
   };
 
@@ -60,7 +91,6 @@ const CreatePost = () => {
         </label>
         <Input
           onChange={(e) => setTitle(e.target.value)}
-          type="text"
           className="mt-2"
           id="title"
           size="lg"
@@ -126,41 +156,44 @@ const CreatePost = () => {
             />
           </label>
         </div>
-        <Editor
-          onInit={(evt, editor) => (editorRef.current = editor)}
-          initialValue="<p>This is the initial content of the editor.</p>"
-          init={{
-            height: 500,
-            menubar: false,
-            plugins: [
-              "advlist",
-              "autolink",
-              "lists",
-              "link",
-              "image",
-              "charmap",
-              "anchor",
-              "searchreplace",
-              "visualblocks",
-              "code",
-              "fullscreen",
-              "insertdatetime",
-              "media",
-              "table",
-              "preview",
-              "help",
-              "wordcount",
-            ],
-            toolbar:
-              "undo redo | blocks | " +
-              "bold italic forecolor | alignleft aligncenter " +
-              "alignright alignjustify | bullist numlist outdent indent | " +
-              "removeformat | help",
-            content_style:
-              "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
-          }}
-        />
+        <div className="min-h-[300px] w-full bg-gray-100 rounded-lg">
+          <Editor
+            onInit={(evt, editor) => (editorRef.current = editor)}
+            initialValue="<p>This is the initial content of the editor.</p>"
+            init={{
+              height: 500,
+              menubar: false,
+              plugins: [
+                "advlist",
+                "autolink",
+                "lists",
+                "link",
+                "image",
+                "charmap",
+                "anchor",
+                "searchreplace",
+                "visualblocks",
+                "code",
+                "fullscreen",
+                "insertdatetime",
+                "media",
+                "table",
+                "preview",
+                "help",
+                "wordcount",
+              ],
+              toolbar:
+                "undo redo | blocks | " +
+                "bold italic forecolor | alignleft aligncenter " +
+                "alignright alignjustify | bullist numlist outdent indent | " +
+                "removeformat | help",
+              content_style:
+                "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+            }}
+          />
+        </div>
         <Btn
+          loading={isLoading}
           type="primary"
           className="mt-7"
           size="large"
